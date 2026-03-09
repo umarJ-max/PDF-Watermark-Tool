@@ -1,0 +1,13 @@
+{
+  "name": "pdf-watermark-tool",
+  "version": "1.0.0",
+  "description": "Client-side PDF watermark tool - 100% browser-based, no data uploaded",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["pdf", "watermark", "client-side", "privacy"],
+  "author": "Umar J",
+  "license": "MIT"
+}

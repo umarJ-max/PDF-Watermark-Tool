@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Watermark Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <h1 class="logo">PDF Watermark</h1>
+            <p class="tagline">100% client-side • Your files never leave your browser</p>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <div class="controls-panel">
+            <h2>Watermark Settings</h2>
+            
+            <div class="upload-area">
+                <label for="pdfFile" class="upload-label">
+                    <svg id="uploadIcon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <span id="uploadText" class="upload-text">Drag & Drop multiple PDFs here</span>
+                    <span class="upload-subtext">or click to browse files</span>
+                    <input type="file" id="pdfFile" accept=".pdf" multiple />
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="watermarkText">What text do you want on the PDF?</label>
+                <input type="text" id="watermarkText" placeholder="e.g. Confidential" />
+            </div>
+
+            <div class="form-group">
+                <label for="opacity">Opacity <span id="opacityValue">0.3</span></label>
+                <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.3" />
+            </div>
+
+            <div class="form-group">
+                <label for="fontSize">Font Size <span id="fontSizeValue">50</span></label>
+                <input type="range" id="fontSize" min="20" max="100" step="5" value="50" />
+            </div>
+
+            <div class="form-group">
+                <label for="color">Choose watermark color</label>
+                <input type="color" id="color" value="#ff0000" />
+            </div>
+
+            <button id="addWatermark" class="btn-primary" disabled>Add Watermark</button>
+            
+            <div id="status"></div>
+        </div>
+
+        <div class="preview-panel">
+            <h3 class="panel-title">Selected Files</h3>
+            <div id="fileList" class="file-list">
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <p>No PDFs uploaded yet. Add files on the left to start a batch.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 PDF Watermark Tool. All rights reserved. Developed by Umar J</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
