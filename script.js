@@ -23,6 +23,9 @@ const opacityValue = document.getElementById('opacityValue');
 const fontSizeInput = document.getElementById('fontSize');
 const fontSizeValue = document.getElementById('fontSizeValue');
 const colorInput = document.getElementById('color');
+const textPositionSelect = document.getElementById('textPosition');
+const textRotationInput = document.getElementById('textRotation');
+const textRotationValue = document.getElementById('textRotationValue');
 
 // Image elements
 const imageFileInput = document.getElementById('imageFile');
@@ -34,11 +37,9 @@ const imageOpacityValue = document.getElementById('imageOpacityValue');
 const imageSizeInput = document.getElementById('imageSize');
 const imageSizeValue = document.getElementById('imageSizeValue');
 const imageControls = document.getElementById('imageControls');
-
-// Position and rotation
-const positionSelect = document.getElementById('position');
-const rotationInput = document.getElementById('rotation');
-const rotationValue = document.getElementById('rotationValue');
+const imagePositionSelect = document.getElementById('imagePosition');
+const imageRotationInput = document.getElementById('imageRotation');
+const imageRotationValue = document.getElementById('imageRotationValue');
 
 // Event Listeners
 pdfFileInput.addEventListener('change', handleFileSelect);
@@ -56,6 +57,9 @@ opacityInput.addEventListener('input', (e) => {
 fontSizeInput.addEventListener('input', (e) => {
     fontSizeValue.textContent = e.target.value;
 });
+textRotationInput.addEventListener('input', (e) => {
+    textRotationValue.textContent = e.target.value;
+});
 
 // Image controls
 imageFileInput.addEventListener('change', handleImageSelect);
@@ -66,15 +70,18 @@ imageOpacityInput.addEventListener('input', (e) => {
 imageSizeInput.addEventListener('input', (e) => {
     imageSizeValue.textContent = e.target.value;
 });
-
-// Rotation control
-rotationInput.addEventListener('input', (e) => {
-    rotationValue.textContent = e.target.value;
+imageRotationInput.addEventListener('input', (e) => {
+    imageRotationValue.textContent = e.target.value;
 });
 
-function setRotation(angle) {
-    rotationInput.value = angle;
-    rotationValue.textContent = angle;
+function setTextRotation(angle) {
+    textRotationInput.value = angle;
+    textRotationValue.textContent = angle;
+}
+
+function setImageRotation(angle) {
+    imageRotationInput.value = angle;
+    imageRotationValue.textContent = angle;
 }
 
 function handleWatermarkTypeChange(e) {
@@ -200,7 +207,7 @@ function hexToRgb(hex) {
 }
 
 function calculatePosition(pageWidth, pageHeight, contentWidth, contentHeight, position) {
-    const margin = 50; // Margin from edges
+    const margin = 50;
     
     switch(position) {
         case 'center':
@@ -264,10 +271,13 @@ async function addWatermarkToBatch() {
     const opacity = parseFloat(opacityInput.value);
     const fontSize = parseInt(fontSizeInput.value);
     const color = hexToRgb(colorInput.value);
+    const textPosition = textPositionSelect.value;
+    const textRotation = parseInt(textRotationInput.value);
+    
     const imageOpacity = parseFloat(imageOpacityInput.value);
     const imageSize = parseInt(imageSizeInput.value);
-    const position = positionSelect.value;
-    const rotation = parseInt(rotationInput.value);
+    const imagePosition = imagePositionSelect.value;
+    const imageRotation = parseInt(imageRotationInput.value);
 
     let processedCount = 0;
     let errorCount = 0;
@@ -310,7 +320,7 @@ async function addWatermarkToBatch() {
                 if ((selectedType === 'text' || selectedType === 'both') && watermarkText) {
                     const textWidth = watermarkText.length * fontSize * 0.6;
                     const textHeight = fontSize;
-                    const textPos = calculatePosition(width, height, textWidth, textHeight, position);
+                    const textPos = calculatePosition(width, height, textWidth, textHeight, textPosition);
                     
                     page.drawText(watermarkText, {
                         x: textPos.x,
@@ -318,14 +328,14 @@ async function addWatermarkToBatch() {
                         size: fontSize,
                         color: rgb(color.r, color.g, color.b),
                         opacity: opacity,
-                        rotate: degrees(rotation)
+                        rotate: degrees(textRotation)
                     });
                 }
                 
                 // Add image watermark if needed
                 if ((selectedType === 'image' || selectedType === 'both') && embeddedImage) {
                     const imgDims = embeddedImage.scale(imageSize / embeddedImage.width);
-                    const imgPos = calculatePosition(width, height, imgDims.width, imgDims.height, position);
+                    const imgPos = calculatePosition(width, height, imgDims.width, imgDims.height, imagePosition);
                     
                     page.drawImage(embeddedImage, {
                         x: imgPos.x,
@@ -333,7 +343,7 @@ async function addWatermarkToBatch() {
                         width: imgDims.width,
                         height: imgDims.height,
                         opacity: imageOpacity,
-                        rotate: degrees(rotation)
+                        rotate: degrees(imageRotation)
                     });
                 }
             });

@@ -47,47 +47,13 @@
                 </div>
             </div>
 
-            <!-- Position & Rotation Settings -->
-            <div class="watermark-section">
-                <h3 class="section-title">Position & Alignment</h3>
-                
-                <div class="form-group">
-                    <label for="position">Position</label>
-                    <select id="position" class="select-input">
-                        <option value="center">Center</option>
-                        <option value="top-left">Top Left</option>
-                        <option value="top-right">Top Right</option>
-                        <option value="bottom-left">Bottom Left</option>
-                        <option value="bottom-right">Bottom Right</option>
-                        <option value="top-center">Top Center</option>
-                        <option value="bottom-center">Bottom Center</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="rotation">Rotation Angle <span id="rotationValue">45</span>°</label>
-                    <input type="range" id="rotation" min="0" max="360" step="15" value="45" />
-                    <div class="rotation-presets">
-                        <button type="button" class="preset-btn" onclick="setRotation(0)">0°</button>
-                        <button type="button" class="preset-btn" onclick="setRotation(45)">45°</button>
-                        <button type="button" class="preset-btn" onclick="setRotation(90)">90°</button>
-                        <button type="button" class="preset-btn" onclick="setRotation(180)">180°</button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Text Watermark Section -->
             <div id="textSection" class="watermark-section">
-                <h3 class="section-title">Text Settings</h3>
+                <h3 class="section-title">Text Watermark</h3>
                 
                 <div class="form-group">
                     <label for="watermarkText">Watermark Text</label>
                     <input type="text" id="watermarkText" placeholder="e.g. Confidential" />
-                </div>
-
-                <div class="form-group">
-                    <label for="opacity">Opacity <span id="opacityValue">0.3</span></label>
-                    <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.3" />
                 </div>
 
                 <div class="form-group">
@@ -99,11 +65,39 @@
                     <label for="color">Text Color</label>
                     <input type="color" id="color" value="#ff0000" />
                 </div>
+
+                <div class="form-group">
+                    <label for="opacity">Opacity <span id="opacityValue">0.3</span></label>
+                    <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.3" />
+                </div>
+
+                <div class="form-group">
+                    <label for="textPosition">Position</label>
+                    <select id="textPosition" class="select-input">
+                        <option value="center">Center</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="top-center">Top Center</option>
+                        <option value="bottom-center">Bottom Center</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="textRotation">Rotation <span id="textRotationValue">45</span>°</label>
+                    <input type="range" id="textRotation" min="0" max="360" step="15" value="45" />
+                    <div class="rotation-presets">
+                        <button type="button" class="preset-btn" onclick="setTextRotation(0)">0°</button>
+                        <button type="button" class="preset-btn" onclick="setTextRotation(45)">45°</button>
+                        <button type="button" class="preset-btn" onclick="setTextRotation(90)">90°</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Image Watermark Section -->
             <div id="imageSection" class="watermark-section" style="display: none;">
-                <h3 class="section-title">Image Settings</h3>
+                <h3 class="section-title">Image Watermark</h3>
                 
                 <div class="image-upload-area">
                     <label for="imageFile" class="image-upload-label">
@@ -125,13 +119,36 @@
 
                 <div id="imageControls" style="display: none;">
                     <div class="form-group">
-                        <label for="imageOpacity">Image Opacity <span id="imageOpacityValue">0.5</span></label>
+                        <label for="imageSize">Image Size <span id="imageSizeValue">200</span>px</label>
+                        <input type="range" id="imageSize" min="50" max="500" step="10" value="200" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageOpacity">Opacity <span id="imageOpacityValue">0.5</span></label>
                         <input type="range" id="imageOpacity" min="0.1" max="1" step="0.1" value="0.5" />
                     </div>
 
                     <div class="form-group">
-                        <label for="imageSize">Image Size <span id="imageSizeValue">200</span>px</label>
-                        <input type="range" id="imageSize" min="50" max="500" step="10" value="200" />
+                        <label for="imagePosition">Position</label>
+                        <select id="imagePosition" class="select-input">
+                            <option value="center">Center</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="top-right">Top Right</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="bottom-center">Bottom Center</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageRotation">Rotation <span id="imageRotationValue">0</span>°</label>
+                        <input type="range" id="imageRotation" min="0" max="360" step="15" value="0" />
+                        <div class="rotation-presets">
+                            <button type="button" class="preset-btn" onclick="setImageRotation(0)">0°</button>
+                            <button type="button" class="preset-btn" onclick="setImageRotation(45)">45°</button>
+                            <button type="button" class="preset-btn" onclick="setImageRotation(90)">90°</button>
+                        </div>
                     </div>
                 </div>
             </div>
