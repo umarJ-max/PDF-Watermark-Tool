@@ -5,8 +5,11 @@ A 100% client-side PDF watermark tool that works entirely in your browser. Your 
 ## Features
 
 - ✅ **Batch Processing** - Upload and watermark multiple PDFs at once
-- ✅ Add custom text watermarks to PDF files
+- ✅ **Text Watermarks** - Add custom text watermarks to PDF files
+- ✅ **Image Watermarks** - Upload logos, signatures, or images as watermarks
+- ✅ **Combined Watermarks** - Use both text and image together
 - ✅ Adjust opacity, font size, and color
+- ✅ Control image size and transparency
 - ✅ Support for encrypted/password-protected PDFs
 - ✅ 100% client-side processing (no server uploads)
 - ✅ Download watermarked PDFs instantly
@@ -16,9 +19,11 @@ A 100% client-side PDF watermark tool that works entirely in your browser. Your 
 ## How to Use
 
 1. Drag & drop multiple PDFs or click to browse files
-2. Customize watermark text, opacity, size, and color
-3. Click "Add Watermark" to process all files
-4. Download your watermarked PDFs automatically
+2. **Add Text Watermark:** Enter custom text (optional)
+3. **Add Image Watermark:** Upload a logo or image (PNG/JPG) (optional)
+4. Customize opacity, size, and color
+5. Click "Add Watermark" to process all files
+6. Download your watermarked PDFs automatically
 
 ## Deploy to Vercel
 

@@ -201,6 +201,70 @@ body {
     background: #ffffff;
 }
 
+.image-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.image-upload-btn:hover {
+    background: #E5E7EB;
+    border-color: #1F2937;
+}
+
+.image-upload-btn svg {
+    color: #6B7280;
+}
+
+.image-upload-btn input {
+    display: none;
+}
+
+.image-preview {
+    margin-top: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.image-preview img {
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: 8px;
+    border: 2px solid #E5E7EB;
+    display: block;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #EF4444;
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s;
+}
+
+.remove-image-btn:hover {
+    background: #DC2626;
+    transform: scale(1.1);
+}
+
 .btn-primary {
     width: 100%;
     padding: 0.875rem 1.5rem;
