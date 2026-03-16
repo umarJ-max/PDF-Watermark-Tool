@@ -51,14 +51,13 @@ const imageRotationValue = document.getElementById('imageRotationValue');
 pdfFileInput.addEventListener('change', handleFileSelect);
 addWatermarkBtn.addEventListener('click', addWatermarkToBatch);
 
-// Watermark type change
 watermarkTypeRadios.forEach(radio => {
     radio.addEventListener('change', handleWatermarkTypeChange);
 });
 
 // Text controls
 opacityInput.addEventListener('input', (e) => {
-    opacityValue.textContent = e.target.value;
+    opacityValue.textContent = parseFloat(e.target.value).toFixed(1);
     updatePreview();
 });
 fontSizeInput.addEventListener('input', (e) => {
@@ -77,7 +76,7 @@ watermarkTextInput.addEventListener('input', updatePreview);
 imageFileInput.addEventListener('change', handleImageSelect);
 removeImageBtn.addEventListener('click', removeWatermarkImage);
 imageOpacityInput.addEventListener('input', (e) => {
-    imageOpacityValue.textContent = e.target.value;
+    imageOpacityValue.textContent = parseFloat(e.target.value).toFixed(1);
     updatePreview();
 });
 imageSizeInput.addEventListener('input', (e) => {
@@ -90,24 +89,24 @@ imageRotationInput.addEventListener('input', (e) => {
     updatePreview();
 });
 
-function setTextRotation(angle) {
+// FIX: Expose rotation setters to window so inline onclick in HTML can find them
+window.setTextRotation = function(angle) {
     textRotationInput.value = angle;
     textRotationValue.textContent = angle;
-}
+    updatePreview();
+};
 
-function setImageRotation(angle) {
+window.setImageRotation = function(angle) {
     imageRotationInput.value = angle;
     imageRotationValue.textContent = angle;
-}
+    updatePreview();
+};
 
 function handleWatermarkTypeChange(e) {
     const selectedType = e.target.value;
-    
-    // Hide all sections first
     textSection.style.display = 'none';
     imageSection.style.display = 'none';
-    
-    // Show relevant sections
+
     if (selectedType === 'text') {
         textSection.style.display = 'block';
     } else if (selectedType === 'image') {
@@ -116,16 +115,13 @@ function handleWatermarkTypeChange(e) {
         textSection.style.display = 'block';
         imageSection.style.display = 'block';
     }
+    updatePreview();
 }
 
 function handleFileSelect(e) {
     const files = Array.from(e.target.files).filter(file => file.type === 'application/pdf');
-    
-    console.log('Files selected:', files.length);
-    
     if (files.length > 0) {
         selectedFiles = [...selectedFiles, ...files];
-        console.log('Total files in queue:', selectedFiles.length);
         updateUI();
         statusDiv.textContent = '';
         statusDiv.className = '';
@@ -134,8 +130,7 @@ function handleFileSelect(e) {
 
 function updateUI() {
     const fileCount = selectedFiles.length;
-    
-    // Update upload box
+
     if (fileCount > 0) {
         uploadLabel.classList.add('has-files');
         uploadText.textContent = `${fileCount} file(s) selected`;
@@ -145,8 +140,7 @@ function updateUI() {
         uploadText.textContent = 'Drag & Drop multiple PDFs here';
         addWatermarkBtn.disabled = true;
     }
-    
-    // Update file list
+
     if (fileCount > 0) {
         fileListContainer.innerHTML = '';
         selectedFiles.forEach((file, index) => {
@@ -182,27 +176,24 @@ function updateUI() {
     }
 }
 
-function removeFile(index) {
+window.removeFile = function(index) {
     selectedFiles.splice(index, 1);
     updateUI();
-}
+};
 
 function handleImageSelect(e) {
     const file = e.target.files[0];
     if (file && (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg')) {
-        console.log('Image selected:', file.name);
-        
         const reader = new FileReader();
         reader.onload = function(event) {
-            watermarkImageBytes = event.target.result;
+            watermarkImageBytes = event.target.result; // data URL string
+
             previewImg.src = event.target.result;
             imagePreview.style.display = 'block';
             imageControls.style.display = 'block';
-            
-            // Load image for preview
+
             watermarkImageElement = new Image();
             watermarkImageElement.onload = function() {
-                console.log('Image loaded for preview');
                 updatePreview();
             };
             watermarkImageElement.src = event.target.result;
@@ -218,7 +209,6 @@ function removeWatermarkImage() {
     previewImg.src = '';
     imagePreview.style.display = 'none';
     imageControls.style.display = 'none';
-    console.log('Image removed');
     updatePreview();
 }
 
@@ -233,13 +223,9 @@ function hexToRgb(hex) {
 
 function calculatePosition(pageWidth, pageHeight, contentWidth, contentHeight, position) {
     const margin = 50;
-    
-    switch(position) {
+    switch (position) {
         case 'center':
-            return {
-                x: pageWidth / 2 - contentWidth / 2,
-                y: pageHeight / 2 - contentHeight / 2
-            };
+            return { x: pageWidth / 2 - contentWidth / 2, y: pageHeight / 2 - contentHeight / 2 };
         case 'top-left':
             return { x: margin, y: pageHeight - margin - contentHeight };
         case 'top-right':
@@ -260,30 +246,28 @@ function calculatePosition(pageWidth, pageHeight, contentWidth, contentHeight, p
 function updatePreview() {
     const selectedType = document.querySelector('input[name="watermarkType"]:checked').value;
     const watermarkText = watermarkTextInput.value.trim();
-    
-    // Show preview only if there's something to show
-    if ((selectedType === 'text' && watermarkText) || 
+
+    const hasContent =
+        (selectedType === 'text' && watermarkText) ||
         (selectedType === 'image' && watermarkImageElement) ||
-        (selectedType === 'both' && (watermarkText || watermarkImageElement))) {
-        livePreview.style.display = 'block';
-    } else {
+        (selectedType === 'both' && (watermarkText || watermarkImageElement));
+
+    if (!hasContent) {
         livePreview.style.display = 'none';
         return;
     }
-    
+
+    livePreview.style.display = 'block';
+
     const canvas = previewCanvas;
     const ctx = previewCtx;
     const width = canvas.width;
     const height = canvas.height;
-    
-    // Clear canvas
+
     ctx.clearRect(0, 0, width, height);
-    
-    // Draw background
     ctx.fillStyle = '#f3f4f6';
     ctx.fillRect(0, 0, width, height);
-    
-    // Draw sample document lines
+
     ctx.strokeStyle = '#d1d5db';
     ctx.lineWidth = 1;
     for (let i = 40; i < height - 40; i += 20) {
@@ -292,23 +276,22 @@ function updatePreview() {
         ctx.lineTo(width - 40, i);
         ctx.stroke();
     }
-    
+
     ctx.save();
-    
-    // Draw text watermark
+
+    // Text watermark preview
     if ((selectedType === 'text' || selectedType === 'both') && watermarkText) {
-        const fontSize = parseInt(fontSizeInput.value) * 0.5; // Scale for preview
+        const fontSize = parseInt(fontSizeInput.value) * 0.5;
         const opacity = parseFloat(opacityInput.value);
         const color = colorInput.value;
         const position = textPositionSelect.value;
         const rotation = parseInt(textRotationInput.value);
-        
-        ctx.font = `${fontSize}px Arial`;
+
+        ctx.font = `bold ${fontSize}px Arial`;
         const textWidth = ctx.measureText(watermarkText).width;
         const textHeight = fontSize;
-        
         const pos = calculatePosition(width, height, textWidth, textHeight, position);
-        
+
         ctx.globalAlpha = opacity;
         ctx.fillStyle = color;
         ctx.translate(pos.x + textWidth / 2, pos.y + textHeight / 2);
@@ -316,62 +299,65 @@ function updatePreview() {
         ctx.fillText(watermarkText, -textWidth / 2, textHeight / 4);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
-    
-    // Draw image watermark
+
+    // Image watermark preview
     if ((selectedType === 'image' || selectedType === 'both') && watermarkImageElement) {
-        const imageSize = parseInt(imageSizeInput.value) * 0.5; // Scale for preview
+        const imageSize = parseInt(imageSizeInput.value) * 0.5;
         const imageOpacity = parseFloat(imageOpacityInput.value);
         const position = imagePositionSelect.value;
         const rotation = parseInt(imageRotationInput.value);
-        
+
         const scale = imageSize / watermarkImageElement.width;
         const imgWidth = watermarkImageElement.width * scale;
         const imgHeight = watermarkImageElement.height * scale;
-        
+
         const pos = calculatePosition(width, height, imgWidth, imgHeight, position);
-        
+
         ctx.globalAlpha = imageOpacity;
         ctx.translate(pos.x + imgWidth / 2, pos.y + imgHeight / 2);
         ctx.rotate((rotation * Math.PI) / 180);
         ctx.drawImage(watermarkImageElement, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
-    
+
     ctx.restore();
 }
 
-async function addWatermarkToBatch() {
-    if (selectedFiles.length === 0) {
-        console.log('No files to process');
-        return;
+// FIX: Convert data URL to Uint8Array using atob (no fetch needed, works in all browsers)
+function dataURLtoUint8Array(dataURL) {
+    const base64 = dataURL.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
     }
+    return bytes;
+}
+
+async function addWatermarkToBatch() {
+    if (selectedFiles.length === 0) return;
 
     const selectedType = document.querySelector('input[name="watermarkType"]:checked').value;
     const watermarkText = watermarkTextInput.value.trim();
-    
-    // Validation
+
     if (selectedType === 'text' && !watermarkText) {
-        statusDiv.textContent = 'Please enter watermark text';
+        statusDiv.textContent = 'Please enter watermark text.';
         statusDiv.className = 'error';
         return;
     }
-    
     if ((selectedType === 'image' || selectedType === 'both') && !watermarkImageBytes) {
-        statusDiv.textContent = 'Please upload an image';
+        statusDiv.textContent = 'Please upload a watermark image.';
         statusDiv.className = 'error';
         return;
     }
 
     const filesToProcess = [...selectedFiles];
     const totalFiles = filesToProcess.length;
-    
-    console.log('Starting batch processing for', totalFiles, 'files');
-    console.log('Watermark type:', selectedType);
-    
+
     selectedFiles = [];
     pdfFileInput.value = '';
     updateUI();
-    
+
     addWatermarkBtn.disabled = true;
     statusDiv.textContent = `Processing ${totalFiles} file(s)... Please wait`;
     statusDiv.className = 'processing';
@@ -381,55 +367,61 @@ async function addWatermarkToBatch() {
     const color = hexToRgb(colorInput.value);
     const textPosition = textPositionSelect.value;
     const textRotation = parseInt(textRotationInput.value);
-    
+
     const imageOpacity = parseFloat(imageOpacityInput.value);
     const imageSize = parseInt(imageSizeInput.value);
     const imagePosition = imagePositionSelect.value;
     const imageRotation = parseInt(imageRotationInput.value);
+
+    // FIX: Convert image to bytes ONCE before the loop, using reliable atob method
+    let imageUint8Array = null;
+    let imageType = null;
+    if ((selectedType === 'image' || selectedType === 'both') && watermarkImageBytes) {
+        try {
+            imageUint8Array = dataURLtoUint8Array(watermarkImageBytes);
+            imageType = watermarkImageBytes.startsWith('data:image/png') ? 'png' : 'jpg';
+        } catch (e) {
+            statusDiv.textContent = 'Failed to load watermark image. Please re-upload it.';
+            statusDiv.className = 'error';
+            addWatermarkBtn.disabled = false;
+            return;
+        }
+    }
 
     let processedCount = 0;
     let errorCount = 0;
 
     for (let i = 0; i < totalFiles; i++) {
         const file = filesToProcess[i];
-        console.log(`Processing file ${i + 1}/${totalFiles}: ${file.name}`);
-        
+
         try {
             statusDiv.textContent = `Processing ${i + 1}/${totalFiles}: ${file.name}`;
-            
+
             const arrayBuffer = await file.arrayBuffer();
-            console.log(`Loaded ${file.name}, size: ${arrayBuffer.byteLength} bytes`);
-            
             const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
             const pages = pdfDoc.getPages();
-            console.log(`PDF has ${pages.length} pages`);
-            
-            // Embed image if needed
+
+            // Embed image once per PDF document
             let embeddedImage = null;
-            if ((selectedType === 'image' || selectedType === 'both') && watermarkImageBytes) {
+            if (imageUint8Array) {
                 try {
-                    if (watermarkImageBytes.startsWith('data:image/png')) {
-                        const pngImageBytes = await fetch(watermarkImageBytes).then(res => res.arrayBuffer());
-                        embeddedImage = await pdfDoc.embedPng(pngImageBytes);
-                    } else if (watermarkImageBytes.startsWith('data:image/jpeg') || watermarkImageBytes.startsWith('data:image/jpg')) {
-                        const jpgImageBytes = await fetch(watermarkImageBytes).then(res => res.arrayBuffer());
-                        embeddedImage = await pdfDoc.embedJpg(jpgImageBytes);
-                    }
-                    console.log('Image embedded successfully');
+                    embeddedImage = imageType === 'png'
+                        ? await pdfDoc.embedPng(imageUint8Array)
+                        : await pdfDoc.embedJpg(imageUint8Array);
                 } catch (imgError) {
-                    console.error('Error embedding image:', imgError);
+                    console.error('Failed to embed image:', imgError);
                 }
             }
-            
+
             pages.forEach(page => {
                 const { width, height } = page.getSize();
-                
-                // Add text watermark if needed
+
+                // Text watermark
                 if ((selectedType === 'text' || selectedType === 'both') && watermarkText) {
                     const textWidth = watermarkText.length * fontSize * 0.6;
                     const textHeight = fontSize;
                     const textPos = calculatePosition(width, height, textWidth, textHeight, textPosition);
-                    
+
                     page.drawText(watermarkText, {
                         x: textPos.x,
                         y: textPos.y,
@@ -439,12 +431,12 @@ async function addWatermarkToBatch() {
                         rotate: degrees(textRotation)
                     });
                 }
-                
-                // Add image watermark if needed
+
+                // Image watermark
                 if ((selectedType === 'image' || selectedType === 'both') && embeddedImage) {
                     const imgDims = embeddedImage.scale(imageSize / embeddedImage.width);
                     const imgPos = calculatePosition(width, height, imgDims.width, imgDims.height, imagePosition);
-                    
+
                     page.drawImage(embeddedImage, {
                         x: imgPos.x,
                         y: imgPos.y,
@@ -457,14 +449,10 @@ async function addWatermarkToBatch() {
             });
 
             const pdfBytes = await pdfDoc.save();
-            console.log(`Saved ${file.name}, size: ${pdfBytes.length} bytes`);
-            
             downloadPDF(pdfBytes, file.name);
             processedCount++;
-            console.log(`Successfully processed ${file.name}`);
-            
+
             if (i < totalFiles - 1) {
-                console.log('Waiting 800ms before next file...');
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
         } catch (error) {
@@ -475,9 +463,14 @@ async function addWatermarkToBatch() {
         }
     }
 
-    console.log(`Batch complete: ${processedCount} succeeded, ${errorCount} failed`);
-    statusDiv.textContent = `Successfully processed ${processedCount} of ${totalFiles} file(s)!`;
-    statusDiv.className = 'success';
+    if (errorCount === 0) {
+        statusDiv.textContent = `✓ Successfully processed ${processedCount} of ${totalFiles} file(s)!`;
+        statusDiv.className = 'success';
+    } else {
+        statusDiv.textContent = `Done: ${processedCount} succeeded, ${errorCount} failed.`;
+        statusDiv.className = errorCount === totalFiles ? 'error' : 'processing';
+    }
+
     addWatermarkBtn.disabled = selectedFiles.length === 0;
 }
 
@@ -486,14 +479,11 @@ function downloadPDF(pdfBytes, originalName) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const newName = originalName.replace('.pdf', '_watermarked.pdf');
-    a.download = newName;
-    console.log(`Triggering download: ${newName}`);
+    a.download = originalName.replace('.pdf', '_watermarked.pdf');
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        console.log(`Cleaned up download: ${newName}`);
     }, 100);
 }
