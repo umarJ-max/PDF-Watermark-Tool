@@ -258,6 +258,52 @@ body {
     background: #ffffff;
 }
 
+.select-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: #1F2937;
+    box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+}
+
+.rotation-presets {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.preset-btn {
+    flex: 1;
+    padding: 0.5rem;
+    background: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preset-btn:hover {
+    background: #E5E7EB;
+    border-color: #1F2937;
+}
+
+.preset-btn:active {
+    background: #1F2937;
+    color: #ffffff;
+}
+
 .image-upload-area {
     margin-bottom: 1rem;
 }

@@ -35,6 +35,11 @@ const imageSizeInput = document.getElementById('imageSize');
 const imageSizeValue = document.getElementById('imageSizeValue');
 const imageControls = document.getElementById('imageControls');
 
+// Position and rotation
+const positionSelect = document.getElementById('position');
+const rotationInput = document.getElementById('rotation');
+const rotationValue = document.getElementById('rotationValue');
+
 // Event Listeners
 pdfFileInput.addEventListener('change', handleFileSelect);
 addWatermarkBtn.addEventListener('click', addWatermarkToBatch);
@@ -61,6 +66,16 @@ imageOpacityInput.addEventListener('input', (e) => {
 imageSizeInput.addEventListener('input', (e) => {
     imageSizeValue.textContent = e.target.value;
 });
+
+// Rotation control
+rotationInput.addEventListener('input', (e) => {
+    rotationValue.textContent = e.target.value;
+});
+
+function setRotation(angle) {
+    rotationInput.value = angle;
+    rotationValue.textContent = angle;
+}
 
 function handleWatermarkTypeChange(e) {
     const selectedType = e.target.value;
@@ -184,6 +199,32 @@ function hexToRgb(hex) {
     } : { r: 1, g: 0, b: 0 };
 }
 
+function calculatePosition(pageWidth, pageHeight, contentWidth, contentHeight, position) {
+    const margin = 50; // Margin from edges
+    
+    switch(position) {
+        case 'center':
+            return {
+                x: pageWidth / 2 - contentWidth / 2,
+                y: pageHeight / 2 - contentHeight / 2
+            };
+        case 'top-left':
+            return { x: margin, y: pageHeight - margin - contentHeight };
+        case 'top-right':
+            return { x: pageWidth - margin - contentWidth, y: pageHeight - margin - contentHeight };
+        case 'bottom-left':
+            return { x: margin, y: margin };
+        case 'bottom-right':
+            return { x: pageWidth - margin - contentWidth, y: margin };
+        case 'top-center':
+            return { x: pageWidth / 2 - contentWidth / 2, y: pageHeight - margin - contentHeight };
+        case 'bottom-center':
+            return { x: pageWidth / 2 - contentWidth / 2, y: margin };
+        default:
+            return { x: pageWidth / 2 - contentWidth / 2, y: pageHeight / 2 - contentHeight / 2 };
+    }
+}
+
 async function addWatermarkToBatch() {
     if (selectedFiles.length === 0) {
         console.log('No files to process');
@@ -225,6 +266,8 @@ async function addWatermarkToBatch() {
     const color = hexToRgb(colorInput.value);
     const imageOpacity = parseFloat(imageOpacityInput.value);
     const imageSize = parseInt(imageSizeInput.value);
+    const position = positionSelect.value;
+    const rotation = parseInt(rotationInput.value);
 
     let processedCount = 0;
     let errorCount = 0;
@@ -265,26 +308,32 @@ async function addWatermarkToBatch() {
                 
                 // Add text watermark if needed
                 if ((selectedType === 'text' || selectedType === 'both') && watermarkText) {
+                    const textWidth = watermarkText.length * fontSize * 0.6;
+                    const textHeight = fontSize;
+                    const textPos = calculatePosition(width, height, textWidth, textHeight, position);
+                    
                     page.drawText(watermarkText, {
-                        x: width / 2 - (watermarkText.length * fontSize / 4),
-                        y: height / 2,
+                        x: textPos.x,
+                        y: textPos.y,
                         size: fontSize,
                         color: rgb(color.r, color.g, color.b),
                         opacity: opacity,
-                        rotate: degrees(45)
+                        rotate: degrees(rotation)
                     });
                 }
                 
                 // Add image watermark if needed
                 if ((selectedType === 'image' || selectedType === 'both') && embeddedImage) {
                     const imgDims = embeddedImage.scale(imageSize / embeddedImage.width);
+                    const imgPos = calculatePosition(width, height, imgDims.width, imgDims.height, position);
+                    
                     page.drawImage(embeddedImage, {
-                        x: width / 2 - imgDims.width / 2,
-                        y: height / 2 - imgDims.height / 2,
+                        x: imgPos.x,
+                        y: imgPos.y,
                         width: imgDims.width,
                         height: imgDims.height,
                         opacity: imageOpacity,
-                        rotate: degrees(45)
+                        rotate: degrees(rotation)
                     });
                 }
             });

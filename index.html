@@ -47,6 +47,35 @@
                 </div>
             </div>
 
+            <!-- Position & Rotation Settings -->
+            <div class="watermark-section">
+                <h3 class="section-title">Position & Alignment</h3>
+                
+                <div class="form-group">
+                    <label for="position">Position</label>
+                    <select id="position" class="select-input">
+                        <option value="center">Center</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="top-center">Top Center</option>
+                        <option value="bottom-center">Bottom Center</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="rotation">Rotation Angle <span id="rotationValue">45</span>°</label>
+                    <input type="range" id="rotation" min="0" max="360" step="15" value="45" />
+                    <div class="rotation-presets">
+                        <button type="button" class="preset-btn" onclick="setRotation(0)">0°</button>
+                        <button type="button" class="preset-btn" onclick="setRotation(45)">45°</button>
+                        <button type="button" class="preset-btn" onclick="setRotation(90)">90°</button>
+                        <button type="button" class="preset-btn" onclick="setRotation(180)">180°</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Text Watermark Section -->
             <div id="textSection" class="watermark-section">
                 <h3 class="section-title">Text Settings</h3>
