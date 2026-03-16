@@ -2,6 +2,7 @@ const { PDFDocument, rgb, degrees } = PDFLib;
 
 let selectedFiles = [];
 let watermarkImageBytes = null;
+let watermarkImageElement = null;
 
 // Elements
 const pdfFileInput = document.getElementById('pdfFile');
@@ -10,6 +11,11 @@ const uploadText = document.getElementById('uploadText');
 const fileListContainer = document.getElementById('fileList');
 const addWatermarkBtn = document.getElementById('addWatermark');
 const statusDiv = document.getElementById('status');
+
+// Preview
+const livePreview = document.getElementById('livePreview');
+const previewCanvas = document.getElementById('previewCanvas');
+const previewCtx = previewCanvas.getContext('2d');
 
 // Watermark type
 const watermarkTypeRadios = document.querySelectorAll('input[name="watermarkType"]');
@@ -53,25 +59,35 @@ watermarkTypeRadios.forEach(radio => {
 // Text controls
 opacityInput.addEventListener('input', (e) => {
     opacityValue.textContent = e.target.value;
+    updatePreview();
 });
 fontSizeInput.addEventListener('input', (e) => {
     fontSizeValue.textContent = e.target.value;
+    updatePreview();
 });
+colorInput.addEventListener('input', updatePreview);
+textPositionSelect.addEventListener('change', updatePreview);
 textRotationInput.addEventListener('input', (e) => {
     textRotationValue.textContent = e.target.value;
+    updatePreview();
 });
+watermarkTextInput.addEventListener('input', updatePreview);
 
 // Image controls
 imageFileInput.addEventListener('change', handleImageSelect);
 removeImageBtn.addEventListener('click', removeWatermarkImage);
 imageOpacityInput.addEventListener('input', (e) => {
     imageOpacityValue.textContent = e.target.value;
+    updatePreview();
 });
 imageSizeInput.addEventListener('input', (e) => {
     imageSizeValue.textContent = e.target.value;
+    updatePreview();
 });
+imagePositionSelect.addEventListener('change', updatePreview);
 imageRotationInput.addEventListener('input', (e) => {
     imageRotationValue.textContent = e.target.value;
+    updatePreview();
 });
 
 function setTextRotation(angle) {
@@ -182,7 +198,14 @@ function handleImageSelect(e) {
             previewImg.src = event.target.result;
             imagePreview.style.display = 'block';
             imageControls.style.display = 'block';
-            console.log('Image loaded successfully');
+            
+            // Load image for preview
+            watermarkImageElement = new Image();
+            watermarkImageElement.onload = function() {
+                console.log('Image loaded for preview');
+                updatePreview();
+            };
+            watermarkImageElement.src = event.target.result;
         };
         reader.readAsDataURL(file);
     }
@@ -190,11 +213,13 @@ function handleImageSelect(e) {
 
 function removeWatermarkImage() {
     watermarkImageBytes = null;
+    watermarkImageElement = null;
     imageFileInput.value = '';
     previewImg.src = '';
     imagePreview.style.display = 'none';
     imageControls.style.display = 'none';
     console.log('Image removed');
+    updatePreview();
 }
 
 function hexToRgb(hex) {
@@ -230,6 +255,89 @@ function calculatePosition(pageWidth, pageHeight, contentWidth, contentHeight, p
         default:
             return { x: pageWidth / 2 - contentWidth / 2, y: pageHeight / 2 - contentHeight / 2 };
     }
+}
+
+function updatePreview() {
+    const selectedType = document.querySelector('input[name="watermarkType"]:checked').value;
+    const watermarkText = watermarkTextInput.value.trim();
+    
+    // Show preview only if there's something to show
+    if ((selectedType === 'text' && watermarkText) || 
+        (selectedType === 'image' && watermarkImageElement) ||
+        (selectedType === 'both' && (watermarkText || watermarkImageElement))) {
+        livePreview.style.display = 'block';
+    } else {
+        livePreview.style.display = 'none';
+        return;
+    }
+    
+    const canvas = previewCanvas;
+    const ctx = previewCtx;
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw background
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw sample document lines
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
+    for (let i = 40; i < height - 40; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(40, i);
+        ctx.lineTo(width - 40, i);
+        ctx.stroke();
+    }
+    
+    ctx.save();
+    
+    // Draw text watermark
+    if ((selectedType === 'text' || selectedType === 'both') && watermarkText) {
+        const fontSize = parseInt(fontSizeInput.value) * 0.5; // Scale for preview
+        const opacity = parseFloat(opacityInput.value);
+        const color = colorInput.value;
+        const position = textPositionSelect.value;
+        const rotation = parseInt(textRotationInput.value);
+        
+        ctx.font = `${fontSize}px Arial`;
+        const textWidth = ctx.measureText(watermarkText).width;
+        const textHeight = fontSize;
+        
+        const pos = calculatePosition(width, height, textWidth, textHeight, position);
+        
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = color;
+        ctx.translate(pos.x + textWidth / 2, pos.y + textHeight / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.fillText(watermarkText, -textWidth / 2, textHeight / 4);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    
+    // Draw image watermark
+    if ((selectedType === 'image' || selectedType === 'both') && watermarkImageElement) {
+        const imageSize = parseInt(imageSizeInput.value) * 0.5; // Scale for preview
+        const imageOpacity = parseFloat(imageOpacityInput.value);
+        const position = imagePositionSelect.value;
+        const rotation = parseInt(imageRotationInput.value);
+        
+        const scale = imageSize / watermarkImageElement.width;
+        const imgWidth = watermarkImageElement.width * scale;
+        const imgHeight = watermarkImageElement.height * scale;
+        
+        const pos = calculatePosition(width, height, imgWidth, imgHeight, position);
+        
+        ctx.globalAlpha = imageOpacity;
+        ctx.translate(pos.x + imgWidth / 2, pos.y + imgHeight / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.drawImage(watermarkImageElement, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    
+    ctx.restore();
 }
 
 async function addWatermarkToBatch() {

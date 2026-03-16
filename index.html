@@ -159,7 +159,19 @@
         </div>
 
         <div class="preview-panel">
-            <h3 class="panel-title">Selected Files</h3>
+            <h3 class="panel-title">Preview & Selected Files</h3>
+            
+            <!-- Live Preview Area -->
+            <div id="livePreview" class="live-preview" style="display: none;">
+                <div class="preview-header">
+                    <span>Watermark Preview</span>
+                </div>
+                <div class="preview-canvas-container">
+                    <canvas id="previewCanvas" width="400" height="300"></canvas>
+                </div>
+            </div>
+            
+            <!-- File List -->
             <div id="fileList" class="file-list">
                 <div class="empty-state">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

@@ -443,6 +443,39 @@ body {
     display: none;
 }
 
+.live-preview {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.preview-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.preview-canvas-container {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#previewCanvas {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+}
+
 .panel-title {
     font-size: 1.25rem;
     font-weight: 600;
