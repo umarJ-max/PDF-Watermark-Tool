@@ -9,128 +9,103 @@
 <body>
     <nav class="navbar">
         <div class="nav-content">
-            <h1 class="logo">PDF Watermark</h1>
-            <p class="tagline">100% client-side • Your files never leave your browser</p>
+            <div class="logo-group">
+                <div class="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                </div>
+                <span class="logo-text">PDF Watermark</span>
+            </div>
+            <div class="privacy-badge">🔒 100% Client-Side</div>
         </div>
     </nav>
 
     <main class="main-container">
         <div class="controls-panel">
-            <h2>Watermark Settings</h2>
-            
-            <div class="upload-area">
-                <label for="pdfFile" class="upload-label">
-                    <svg id="uploadIcon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- PDF Upload -->
+            <div class="section">
+                <div class="section-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                     </svg>
-                    <span id="uploadText" class="upload-text">Drag & Drop multiple PDFs here</span>
-                    <span class="upload-subtext">or click to browse files</span>
+                    <span>Upload PDFs</span>
+                </div>
+                <label class="upload-box">
                     <input type="file" id="pdfFile" accept=".pdf" multiple />
-                </label>
-            </div>
-
-            <div class="form-group">
-                <label>Watermark Type</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="watermarkType" value="text" checked />
-                        <span>Text Only</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="watermarkType" value="image" />
-                        <span>Image Only</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="watermarkType" value="both" />
-                        <span>Text + Image</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Text Watermark Section -->
-            <div id="textSection" class="watermark-section">
-                <h3 class="section-title">Text Watermark</h3>
-                
-                <div class="form-group">
-                    <label for="watermarkText">Watermark Text</label>
-                    <input type="text" id="watermarkText" placeholder="e.g. Confidential" />
-                </div>
-
-                <div class="form-group">
-                    <label for="fontSize">Font Size <span id="fontSizeValue">50</span></label>
-                    <input type="range" id="fontSize" min="20" max="100" step="5" value="50" />
-                </div>
-
-                <div class="form-group">
-                    <label for="color">Text Color</label>
-                    <input type="color" id="color" value="#ff0000" />
-                </div>
-
-                <div class="form-group">
-                    <label for="opacity">Opacity <span id="opacityValue">0.3</span></label>
-                    <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.3" />
-                </div>
-
-                <div class="form-group">
-                    <label for="textPosition">Position</label>
-                    <select id="textPosition" class="select-input">
-                        <option value="center">Center</option>
-                        <option value="top-left">Top Left</option>
-                        <option value="top-right">Top Right</option>
-                        <option value="bottom-left">Bottom Left</option>
-                        <option value="bottom-right">Bottom Right</option>
-                        <option value="top-center">Top Center</option>
-                        <option value="bottom-center">Bottom Center</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="textRotation">Rotation <span id="textRotationValue">45</span>°</label>
-                    <input type="range" id="textRotation" min="0" max="360" step="15" value="45" />
-                    <div class="rotation-presets">
-                        <button type="button" class="preset-btn" onclick="setTextRotation(0)">0°</button>
-                        <button type="button" class="preset-btn" onclick="setTextRotation(45)">45°</button>
-                        <button type="button" class="preset-btn" onclick="setTextRotation(90)">90°</button>
+                    <div class="upload-box-inner" id="uploadBoxInner">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <span class="upload-main-text" id="uploadMainText">Drag & drop PDFs here</span>
+                        <span class="upload-sub-text">or click to browse</span>
                     </div>
-                </div>
+                </label>
+                <div class="file-list-inline" id="fileListInline"></div>
             </div>
 
-            <!-- Image Watermark Section -->
-            <div id="imageSection" class="watermark-section" style="display: none;">
-                <h3 class="section-title">Image Watermark</h3>
-                
-                <div class="image-upload-area">
-                    <label for="imageFile" class="image-upload-label">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <hr class="divider">
+
+            <!-- Watermark Mode -->
+            <div class="section">
+                <div class="section-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>Watermark Type</span>
+                </div>
+                <div class="mode-tabs">
+                    <button type="button" class="mode-tab active" data-mode="text">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="4 7 4 4 20 4 20 7"/>
+                            <line x1="9" y1="20" x2="15" y2="20"/>
+                            <line x1="12" y1="4" x2="12" y2="20"/>
+                        </svg>
+                        Text
+                    </button>
+                    <button type="button" class="mode-tab" data-mode="image">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                             <circle cx="8.5" cy="8.5" r="1.5"/>
                             <polyline points="21 15 16 10 5 21"/>
                         </svg>
-                        <span>Click to upload image</span>
-                        <small>PNG or JPG</small>
-                        <input type="file" id="imageFile" accept="image/png,image/jpeg,image/jpg" />
-                    </label>
-                    
-                    <div id="imagePreview" class="image-preview-card" style="display: none;">
-                        <img id="previewImg" src="" alt="Preview" />
-                        <button type="button" id="removeImage" class="remove-image-btn">Remove Image</button>
+                        Image
+                    </button>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Text Watermark Controls -->
+            <div id="textControls" class="watermark-controls">
+                <div class="form-row">
+                    <label class="field-label">Watermark Text</label>
+                    <input type="text" id="watermarkText" class="text-input" placeholder="e.g. Confidential" />
+                </div>
+
+                <div class="form-row two-col">
+                    <div>
+                        <label class="field-label">Font Size <span class="val" id="fontSizeValue">50</span></label>
+                        <input type="range" id="fontSize" min="20" max="100" step="5" value="50" />
+                    </div>
+                    <div>
+                        <label class="field-label">Opacity <span class="val" id="opacityValue">0.3</span></label>
+                        <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.3" />
                     </div>
                 </div>
 
-                <div id="imageControls" style="display: none;">
-                    <div class="form-group">
-                        <label for="imageSize">Image Size <span id="imageSizeValue">200</span>px</label>
-                        <input type="range" id="imageSize" min="50" max="500" step="10" value="200" />
-                    </div>
+                <div class="form-row">
+                    <label class="field-label">Text Color</label>
+                    <input type="color" id="color" class="color-input" value="#ff0000" />
+                </div>
 
-                    <div class="form-group">
-                        <label for="imageOpacity">Opacity <span id="imageOpacityValue">0.5</span></label>
-                        <input type="range" id="imageOpacity" min="0.1" max="1" step="0.1" value="0.5" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="imagePosition">Position</label>
-                        <select id="imagePosition" class="select-input">
+                <div class="form-row two-col">
+                    <div>
+                        <label class="field-label">Position</label>
+                        <select id="textPosition" class="select-input">
                             <option value="center">Center</option>
                             <option value="top-left">Top Left</option>
                             <option value="top-right">Top Right</option>
@@ -140,45 +115,146 @@
                             <option value="bottom-center">Bottom Center</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="field-label">Rotation <span class="val" id="textRotationValue">45</span>°</label>
+                        <input type="range" id="textRotation" min="0" max="360" step="15" value="45" />
+                    </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="imageRotation">Rotation <span id="imageRotationValue">0</span>°</label>
-                        <input type="range" id="imageRotation" min="0" max="360" step="15" value="0" />
-                        <div class="rotation-presets">
-                            <button type="button" class="preset-btn" onclick="setImageRotation(0)">0°</button>
-                            <button type="button" class="preset-btn" onclick="setImageRotation(45)">45°</button>
-                            <button type="button" class="preset-btn" onclick="setImageRotation(90)">90°</button>
+                <div class="presets">
+                    <button type="button" class="preset-btn" onclick="setTextRotation(0)">0°</button>
+                    <button type="button" class="preset-btn" onclick="setTextRotation(45)">45°</button>
+                    <button type="button" class="preset-btn" onclick="setTextRotation(90)">90°</button>
+                    <button type="button" class="preset-btn" onclick="setTextRotation(180)">180°</button>
+                </div>
+            </div>
+
+            <!-- Image Watermark Controls -->
+            <div id="imageControls" class="watermark-controls" style="display: none;">
+                <div id="imageUploadArea">
+                    <label class="img-upload-box">
+                        <input type="file" id="imageFile" accept="image/png,image/jpeg,image/jpg" />
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <span>Click to upload image</span>
+                        <small>PNG or JPG</small>
+                    </label>
+                </div>
+
+                <div id="imageLoadedArea" style="display: none;">
+                    <div class="img-loaded-row">
+                        <div class="img-thumb-wrap">
+                            <img id="previewImg" src="" alt="Preview" />
                         </div>
+                        <div class="img-loaded-info">
+                            <div class="img-filename" id="imageName">image.png</div>
+                            <button type="button" class="swap-btn" id="removeImage">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row two-col">
+                        <div>
+                            <label class="field-label">Image Size <span class="val" id="imageSizeValue">200</span>px</label>
+                            <input type="range" id="imageSize" min="50" max="500" step="10" value="200" />
+                        </div>
+                        <div>
+                            <label class="field-label">Opacity <span class="val" id="imageOpacityValue">0.5</span></label>
+                            <input type="range" id="imageOpacity" min="0.1" max="1" step="0.1" value="0.5" />
+                        </div>
+                    </div>
+
+                    <div class="form-row two-col">
+                        <div>
+                            <label class="field-label">Position</label>
+                            <select id="imagePosition" class="select-input">
+                                <option value="center">Center</option>
+                                <option value="top-left">Top Left</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-right">Bottom Right</option>
+                                <option value="top-center">Top Center</option>
+                                <option value="bottom-center">Bottom Center</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="field-label">Rotation <span class="val" id="imageRotationValue">0</span>°</label>
+                            <input type="range" id="imageRotation" min="0" max="360" step="15" value="0" />
+                        </div>
+                    </div>
+
+                    <div class="presets">
+                        <button type="button" class="preset-btn" onclick="setImageRotation(0)">0°</button>
+                        <button type="button" class="preset-btn" onclick="setImageRotation(45)">45°</button>
+                        <button type="button" class="preset-btn" onclick="setImageRotation(90)">90°</button>
+                        <button type="button" class="preset-btn" onclick="setImageRotation(180)">180°</button>
                     </div>
                 </div>
             </div>
 
-            <button id="addWatermark" class="btn-primary" disabled>Add Watermark</button>
-            
+            <hr class="divider">
+
+            <button id="addWatermark" class="btn-primary" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Add Watermark
+            </button>
+
             <div id="status"></div>
         </div>
 
         <div class="preview-panel">
-            <h3 class="panel-title">Preview & Selected Files</h3>
-            
-            <!-- Live Preview Area -->
-            <div id="livePreview" class="live-preview" style="display: none;">
-                <div class="preview-header">
-                    <span>Watermark Preview</span>
+            <div class="section">
+                <div class="section-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    <span>Live Preview</span>
                 </div>
-                <div class="preview-canvas-container">
-                    <canvas id="previewCanvas" width="400" height="300"></canvas>
+                <div class="preview-canvas-wrap" id="previewCanvasWrap">
+                    <div class="preview-placeholder" id="previewPlaceholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                        <p>Your watermark preview will appear here</p>
+                    </div>
+                    <canvas id="previewCanvas" width="600" height="450" style="display: none;"></canvas>
                 </div>
             </div>
-            
-            <!-- File List -->
-            <div id="fileList" class="file-list">
-                <div class="empty-state">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+
+            <hr class="divider">
+
+            <div class="section">
+                <div class="section-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
                     </svg>
-                    <p>No PDFs uploaded yet. Add files on the left to start a batch.</p>
+                    <span>File Queue</span>
+                    <span class="count-badge" id="fileCount" style="display: none;">0</span>
+                </div>
+                <div class="file-queue" id="fileQueue">
+                    <div class="queue-empty">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <p>No files selected yet</p>
+                    </div>
                 </div>
             </div>
         </div>
