@@ -1,25 +1,30 @@
 const { PDFDocument, rgb, degrees } = PDFLib;
 
 let selectedFiles = [];
-let watermarkImage = null;
 let watermarkImageBytes = null;
 
 // Elements
 const pdfFileInput = document.getElementById('pdfFile');
 const uploadLabel = document.querySelector('.upload-label');
 const uploadText = document.getElementById('uploadText');
-const uploadIcon = document.getElementById('uploadIcon');
 const fileListContainer = document.getElementById('fileList');
+const addWatermarkBtn = document.getElementById('addWatermark');
+const statusDiv = document.getElementById('status');
+
+// Watermark type
+const watermarkTypeRadios = document.querySelectorAll('input[name="watermarkType"]');
+const textSection = document.getElementById('textSection');
+const imageSection = document.getElementById('imageSection');
+
+// Text elements
 const watermarkTextInput = document.getElementById('watermarkText');
 const opacityInput = document.getElementById('opacity');
 const opacityValue = document.getElementById('opacityValue');
 const fontSizeInput = document.getElementById('fontSize');
 const fontSizeValue = document.getElementById('fontSizeValue');
 const colorInput = document.getElementById('color');
-const addWatermarkBtn = document.getElementById('addWatermark');
-const statusDiv = document.getElementById('status');
 
-// Image watermark elements
+// Image elements
 const imageFileInput = document.getElementById('imageFile');
 const imagePreview = document.getElementById('imagePreview');
 const previewImg = document.getElementById('previewImg');
@@ -28,20 +33,26 @@ const imageOpacityInput = document.getElementById('imageOpacity');
 const imageOpacityValue = document.getElementById('imageOpacityValue');
 const imageSizeInput = document.getElementById('imageSize');
 const imageSizeValue = document.getElementById('imageSizeValue');
-const imageOpacityGroup = document.getElementById('imageOpacityGroup');
-const imageSizeGroup = document.getElementById('imageSizeGroup');
+const imageControls = document.getElementById('imageControls');
 
 // Event Listeners
 pdfFileInput.addEventListener('change', handleFileSelect);
+addWatermarkBtn.addEventListener('click', addWatermarkToBatch);
+
+// Watermark type change
+watermarkTypeRadios.forEach(radio => {
+    radio.addEventListener('change', handleWatermarkTypeChange);
+});
+
+// Text controls
 opacityInput.addEventListener('input', (e) => {
     opacityValue.textContent = e.target.value;
 });
 fontSizeInput.addEventListener('input', (e) => {
     fontSizeValue.textContent = e.target.value;
 });
-addWatermarkBtn.addEventListener('click', addWatermarkToBatch);
 
-// Image watermark listeners
+// Image controls
 imageFileInput.addEventListener('change', handleImageSelect);
 removeImageBtn.addEventListener('click', removeWatermarkImage);
 imageOpacityInput.addEventListener('input', (e) => {
@@ -50,6 +61,24 @@ imageOpacityInput.addEventListener('input', (e) => {
 imageSizeInput.addEventListener('input', (e) => {
     imageSizeValue.textContent = e.target.value;
 });
+
+function handleWatermarkTypeChange(e) {
+    const selectedType = e.target.value;
+    
+    // Hide all sections first
+    textSection.style.display = 'none';
+    imageSection.style.display = 'none';
+    
+    // Show relevant sections
+    if (selectedType === 'text') {
+        textSection.style.display = 'block';
+    } else if (selectedType === 'image') {
+        imageSection.style.display = 'block';
+    } else if (selectedType === 'both') {
+        textSection.style.display = 'block';
+        imageSection.style.display = 'block';
+    }
+}
 
 function handleFileSelect(e) {
     const files = Array.from(e.target.files).filter(file => file.type === 'application/pdf');
@@ -126,12 +155,11 @@ function handleImageSelect(e) {
         console.log('Image selected:', file.name);
         
         const reader = new FileReader();
-        reader.onload = async function(event) {
+        reader.onload = function(event) {
             watermarkImageBytes = event.target.result;
             previewImg.src = event.target.result;
             imagePreview.style.display = 'block';
-            imageOpacityGroup.style.display = 'block';
-            imageSizeGroup.style.display = 'block';
+            imageControls.style.display = 'block';
             console.log('Image loaded successfully');
         };
         reader.readAsDataURL(file);
@@ -139,13 +167,11 @@ function handleImageSelect(e) {
 }
 
 function removeWatermarkImage() {
-    watermarkImage = null;
     watermarkImageBytes = null;
     imageFileInput.value = '';
     previewImg.src = '';
     imagePreview.style.display = 'none';
-    imageOpacityGroup.style.display = 'none';
-    imageSizeGroup.style.display = 'none';
+    imageControls.style.display = 'none';
     console.log('Image removed');
 }
 
@@ -164,11 +190,27 @@ async function addWatermarkToBatch() {
         return;
     }
 
+    const selectedType = document.querySelector('input[name="watermarkType"]:checked').value;
+    const watermarkText = watermarkTextInput.value.trim();
+    
+    // Validation
+    if (selectedType === 'text' && !watermarkText) {
+        statusDiv.textContent = 'Please enter watermark text';
+        statusDiv.className = 'error';
+        return;
+    }
+    
+    if ((selectedType === 'image' || selectedType === 'both') && !watermarkImageBytes) {
+        statusDiv.textContent = 'Please upload an image';
+        statusDiv.className = 'error';
+        return;
+    }
+
     const filesToProcess = [...selectedFiles];
     const totalFiles = filesToProcess.length;
     
     console.log('Starting batch processing for', totalFiles, 'files');
-    console.log('Files to process:', filesToProcess.map(f => f.name));
+    console.log('Watermark type:', selectedType);
     
     selectedFiles = [];
     pdfFileInput.value = '';
@@ -178,11 +220,9 @@ async function addWatermarkToBatch() {
     statusDiv.textContent = `Processing ${totalFiles} file(s)... Please wait`;
     statusDiv.className = 'processing';
 
-    const watermarkText = watermarkTextInput.value.trim() || 'CONFIDENTIAL';
     const opacity = parseFloat(opacityInput.value);
     const fontSize = parseInt(fontSizeInput.value);
     const color = hexToRgb(colorInput.value);
-    
     const imageOpacity = parseFloat(imageOpacityInput.value);
     const imageSize = parseInt(imageSizeInput.value);
 
@@ -203,9 +243,9 @@ async function addWatermarkToBatch() {
             const pages = pdfDoc.getPages();
             console.log(`PDF has ${pages.length} pages`);
             
-            // Embed image if provided
+            // Embed image if needed
             let embeddedImage = null;
-            if (watermarkImageBytes) {
+            if ((selectedType === 'image' || selectedType === 'both') && watermarkImageBytes) {
                 try {
                     if (watermarkImageBytes.startsWith('data:image/png')) {
                         const pngImageBytes = await fetch(watermarkImageBytes).then(res => res.arrayBuffer());
@@ -223,8 +263,8 @@ async function addWatermarkToBatch() {
             pages.forEach(page => {
                 const { width, height } = page.getSize();
                 
-                // Add text watermark if provided
-                if (watermarkText) {
+                // Add text watermark if needed
+                if ((selectedType === 'text' || selectedType === 'both') && watermarkText) {
                     page.drawText(watermarkText, {
                         x: width / 2 - (watermarkText.length * fontSize / 4),
                         y: height / 2,
@@ -235,8 +275,8 @@ async function addWatermarkToBatch() {
                     });
                 }
                 
-                // Add image watermark if provided
-                if (embeddedImage) {
+                // Add image watermark if needed
+                if ((selectedType === 'image' || selectedType === 'both') && embeddedImage) {
                     const imgDims = embeddedImage.scale(imageSize / embeddedImage.width);
                     page.drawImage(embeddedImage, {
                         x: width / 2 - imgDims.width / 2,
